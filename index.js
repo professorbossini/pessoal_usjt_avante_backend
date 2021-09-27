@@ -1,9 +1,11 @@
 const processador = require('./processador')
 const titleCase = require('title-case')
 const _ = require('underscore')
+const cors = require('cors')
 const express = require('express')
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 app.get('/', (req, res) => {
     res.send("Hey, this is Avante! USJT")
