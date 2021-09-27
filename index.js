@@ -25,9 +25,10 @@ app.get('/myself_among_others', (req, res) => {
         console.log(indexOfUpLimit)
         console.log(posicaoDoAluno)
         console.log(indexOfBottomLimit)
+        const thePositions = _.range(indexOfUpLimit, indexOfBottomLimit)
         const upPortion = consolidatedAvtCoins.slice(indexOfUpLimit, posicaoDoAluno)
         const BottomPortion = consolidatedAvtCoins.slice(posicaoDoAluno, indexOfBottomLimit)
-        theFinalWindow = [...upPortion, ...BottomPortion]
+        theFinalWindow = [...upPortion, ...BottomPortion].map((e, i) => ({posicao: thePositions[i], ...e}))
         console.log(theFinalWindow)
         getDados(theFinalWindow)
     }
