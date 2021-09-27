@@ -1,4 +1,4 @@
-const processador = require ('./dados/presenca/processador')
+const processador = require ('./processador')
 const titleCase = require ('title-case')
 const express = require('express')
 const app = express()
