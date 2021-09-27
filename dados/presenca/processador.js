@@ -5,7 +5,7 @@ _ = require ('underscore')
 module.exports =  (getDados) => {
     const avtCoinsPorPresenca = 15
     let alunos = []
-    fs.createReadStream("dados\\presenca\\presencas.csv")
+    fs.createReadStream("presencas.csv")
         .pipe(csv.parse({headers: true}))
         .on('data', (linha) =>{ 
             const date = new Date(linha['Carimbo de data/hora'])
