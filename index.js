@@ -10,6 +10,7 @@ app.get ('/', (req, res) => {
 
 app.get ("/student_status", (req, res) => {
     const getDados = (dados) => {
+        res.status(dados.ra !== 0 ? 200 : 404)
         res.send(dados)
     }
     const getStudentStatus = (ra, getDados) => {
