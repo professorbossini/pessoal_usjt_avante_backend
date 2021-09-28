@@ -37,6 +37,21 @@ app.get('/myself_among_others', (req, res) => {
 
 app.get('/top_ones', (req, res) => {
 
+    const getDados = (dados) => {
+        res.send(dados)
+    }
+
+    const aux = (consolidatedAvtCoins) => {
+        consolidatedAvtCoins = consolidatedAvtCoins.map(a => ({ra: a.ra, nome: titleCase.titleCase(a.nome.toString().toLowerCase()), avtCoins: a.avtCoins}))
+        consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.nome)
+        consolidatedAvtCoins = consolidatedAvtCoins.reverse()
+        consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.avtCoins)
+        consolidatedAvtCoins = consolidatedAvtCoins.reverse()
+        getDados(consolidatedAvtCoins.slice(0, 10))
+    }
+
+    processador.consolidatedAvtCoins(aux)
+
 })
 
 app.get("/student_status", (req, res) => {
