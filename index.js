@@ -36,47 +36,39 @@ app.get('/myself_among_others', (req, res) => {
 })
 
 app.get('/top_ones', (req, res) => {
-
-    const getDados = (dados) => {
-        res.send(dados)
-    }
-
-    const aux = (consolidatedAvtCoins) => {
+    processador.consolidatedAvtCoins()
+    .then (consolidatedAvtCoins => {
         consolidatedAvtCoins = consolidatedAvtCoins.map(a => ({ra: a.ra, nome: titleCase.titleCase(a.nome.toString().toLowerCase()), avtCoins: a.avtCoins}))
         consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.nome)
         consolidatedAvtCoins = consolidatedAvtCoins.reverse()
         consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.avtCoins)
         consolidatedAvtCoins = consolidatedAvtCoins.reverse()
-        getDados(consolidatedAvtCoins.slice(0, 10))
-    }
-
-    processador.consolidatedAvtCoins(aux)
-
+        res.send(consolidatedAvtCoins.slice(0, 10))
+    })
 })
 
 app.get("/student_status", (req, res) => {
-    const getDados = (dados) => {
-        res.status(dados.ra !== 0 ? 200 : 404)
-        res.send(dados)
-    }
-    const getStudentStatus = (ra, getDados) => {
-        const aux = (itens) => {
-            let alunoResultado = { nome: '', ra: 0, avtCoins: 0 }
-            for (let item of itens) {
+    processador.obterBaseInteiraPorData()
+    .then(baseInteiraPorData => {
+        let alunoResultado = { nome: '', ra: 0, avtCoins: 0 }
+            for (let item of baseInteiraPorData) {
                 for (let aluno of item.alunos) {
-                    if (ra == aluno.ra) {
+                    if (req.query.ra == aluno.ra) {
                         alunoResultado.nome = titleCase.titleCase(aluno.nome.toString().toLowerCase())
                         alunoResultado.ra = aluno.ra
                         alunoResultado.avtCoins += +aluno.avtCoins
                     }
                 }
             }
-            getDados(alunoResultado)
-        }
-        processador.obterBaseInteiraPorData(aux)
-    }
-    getStudentStatus(req.query.ra, getDados)
+        res.status(alunoResultado)
+    })
 })
 
+app.get('/date_of_database', (req, res) => {
+    const getDados = (dados) => {
+        res.send(dados)
+    }
+    processador.obterDataDaBase(getDados)
+})
 app.listen(process.env.PORT || 3000)
 
