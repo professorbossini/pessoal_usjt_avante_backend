@@ -38,7 +38,7 @@ const obterBaseInteiraPorData = () => {
 const consolidatedAvtCoins = () => {
     return new Promise ((resolve, reject) => {
             obterBaseInteiraPorData()
-            .then(dados => {
+            .then(async dados => {
                 let alunosConsolidados = []
                 for (objeto of dados) {
                         for (aluno of objeto.alunos) {
@@ -53,18 +53,14 @@ const consolidatedAvtCoins = () => {
                 }
                 const avaliacoes = ['avaliacao_listas']
                 for (avaliacao of avaliacoes){
-                    console.log(avaliacao)
-                    obterPontuacaoDaAvalicao(avaliacao).then(notasDeAvaliacao => {
-                        for (notaDeAvaliacao of notasDeAvaliacao){
-                            console.log(notaDeAvaliacao)
-                            for (alunoConsolidado of alunosConsolidados){
-                                if (+alunoConsolidado.ra === +notasDeAvaliacao.ra){
-                                    console.log ('entrou')
-                                    alunoConsolidado.avtCoins += notasDeAvaliacao.pontuacao
-                                }
+                    const notasDeAvaliacao = await obterPontuacaoDaAvalicao(avaliacao)
+                    for (notaDeAvaliacao of notasDeAvaliacao){
+                        for (alunoConsolidado of alunosConsolidados){
+                            if (+alunoConsolidado.ra === +notaDeAvaliacao.ra){
+                                alunoConsolidado.avtCoins += +notaDeAvaliacao.pontuacao
                             }
                         }
-                    })
+                    }
                 }
                 resolve (alunosConsolidados)
             })
@@ -97,7 +93,9 @@ const obterPontuacaoDaAvalicao = (avaliacao) => {
                 })
             }
         })
-        .on ('end', resolve(alunos))
+        .on ('end', (rowNumber) => {
+            resolve(alunos)
+        })
     })
 }
 
