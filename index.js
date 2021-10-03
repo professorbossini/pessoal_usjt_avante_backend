@@ -29,7 +29,7 @@ app.get('/myself_among_others', (req, res) => {
             const thePositions = _.range(indexOfUpLimit, indexOfBottomLimit)
             const upPortion = consolidatedAvtCoins.slice(indexOfUpLimit, posicaoDoAluno)
             const BottomPortion = consolidatedAvtCoins.slice(posicaoDoAluno, indexOfBottomLimit)
-            theFinalWindow = [...upPortion, ...BottomPortion].map((e, i) => ({posicao: thePositions[i], ...e}))
+            theFinalWindow = [...upPortion, ...BottomPortion].map((e, i) => ({posicao: thePositions[i] + 1, ...e}))
             console.log(theFinalWindow)
            res.send(theFinalWindow)
     })
