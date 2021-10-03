@@ -16,6 +16,8 @@ app.get('/myself_among_others', (req, res) => {
 
     processador.consolidatedAvtCoins()
     .then (consolidatedAvtCoins => {
+            consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.nome)
+            consolidatedAvtCoins = consolidatedAvtCoins.reverse()
             consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, o => o.avtCoins)
             consolidatedAvtCoins = consolidatedAvtCoins.reverse()
             const posicaoDoAluno = _.findIndex(consolidatedAvtCoins, (a) => a.ra === req.query.ra)

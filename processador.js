@@ -68,8 +68,8 @@ const consolidatedAvtCoins = () => {
 })}
 
 const obterDataDaBase = (callback) => {
-    const dataPresencas = fs.statSync('presencas.csv')?.mtime
-    const dataAvaliacoes = fs.statSync('avaliacoes.csv')?.mtime
+    const dataPresencas = fs.statSync('presencas.csv').ctime
+    const dataAvaliacoes = fs.statSync('avaliacao_listas.csv')?.mtime
     callback({
         dataPresencas, dataAvaliacoes
     })
