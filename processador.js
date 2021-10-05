@@ -51,6 +51,7 @@ const consolidatedAvtCoins = () => {
                             }
                         }
                 }
+                //avaliacoes
                 const avaliacoes = ['avaliacao_listas']
                 for (avaliacao of avaliacoes){
                     const notasDeAvaliacao = await obterPontuacaoDaAvalicao(avaliacao)
@@ -62,10 +63,60 @@ const consolidatedAvtCoins = () => {
                         }
                     }
                 }
+                //desafios
+                const desafiosCollection = await calcularPontuacaoDeTodosOsDesafios()
+                // console.log(desafios)
+                for (desafios of desafiosCollection){
+                    for (desafio of desafios){
+                        for (alunoConsolidado of alunosConsolidados){
+                            // console.log (+alunoConsolidado.ra + ' ' + desafio.ra)
+                            if (+alunoConsolidado.ra === +desafio.ra){
+                                alunoConsolidado.avtCoins += +desafio.pontuacao
+                            }
+                        }
+                    }
+                }
                 resolve (alunosConsolidados)
             })
     
 })}
+
+const calcularPontuacaoDeTodosOsDesafios = () => {
+    return new Promise ((resolve, reject) => {
+        const desafios = [
+            {
+                nome: 'desafio_01.csv',
+                pontuacao: 10
+            },
+            {
+                nome: 'desafio_02.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_03.csv',
+                pontuacao: 5
+            }
+        ]
+        let promises = []
+        desafios.forEach(desafio => {
+            promises.push(calcularPontuacaoDeUmDesafio(desafio))
+        })
+        Promise.all(promises).then((result) => resolve(result))
+    })
+
+}
+
+const calcularPontuacaoDeUmDesafio  = (desafio) => {
+    return new Promise ((resolve, reject) => {
+        let result = []
+        fs.createReadStream(`${desafio.nome}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            result.push({ra: linha['RA:'], pontuacao: desafio.pontuacao})
+        })
+        .on('end', () => resolve(result) )
+    })
+}
 
 const obterDataDaBase = (callback) => {
     const dataPresencas = fs.statSync('presencas.csv').ctime
