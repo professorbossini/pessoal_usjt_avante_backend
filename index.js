@@ -43,7 +43,7 @@ app.get('/top_ones', (req, res) => {
         consolidatedAvtCoins = consolidatedAvtCoins.reverse()
         consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.avtCoins)
         consolidatedAvtCoins = consolidatedAvtCoins.reverse()
-        res.send(consolidatedAvtCoins.slice(0, 10))
+        res.send(consolidatedAvtCoins.slice(0, +req?.query?.n || 10))
     })
 })
 
