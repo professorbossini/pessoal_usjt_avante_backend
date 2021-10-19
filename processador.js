@@ -76,6 +76,15 @@ const consolidatedAvtCoins = () => {
                         }
                     }
                 }
+                //questionarios (só tem um por enquanto)
+                const pontuacoesQuestionario = await calcularPontuacaoDeUmQuestionario()
+                for (pontuacaoQuestionario of pontuacoesQuestionario){
+                    for (alunoConsolidado  of alunosConsolidados){
+                        if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
+                            alunoConsolidado.avtCoins += +pontuacaoQuestionario.pontuacao
+                        }
+                    }
+                }
                 resolve (alunosConsolidados)
             })
     
@@ -146,6 +155,21 @@ const obterPontuacaoDaAvalicao = (avaliacao) => {
         })
         .on ('end', (rowNumber) => {
             resolve(alunos)
+        })
+    })
+}
+
+const calcularPontuacaoDeUmQuestionario = () =>{
+    return new Promise ((resolve, reject) => {
+        let pontuacao = []
+        const nomeQuestionario = 'questionario_50avtcoins.csv'
+        fs.createReadStream(nomeQuestionario)
+        .pipe(csv.parse({headers:true}))
+        .on('data', linha => {
+            pontuacao.push({ra: linha['RA:'], pontuacao: 50})
+        })
+        .on('end', rowNumber => {
+            resolve(pontuacao)
         })
     })
 }
