@@ -47,8 +47,8 @@ app.get('/top_ones', (req, res) => {
     })
 })
 
+//it is ignored, getting one student is being done using myself_among_others
 app.get("/student_status", (req, res) => {
-    console.log("Chegou aqui")
     processador.obterBaseInteiraPorData()
     .then(baseInteiraPorData => {
         let alunoResultado = { nome: '', ra: 0, avtCoins: 0 }
@@ -61,7 +61,7 @@ app.get("/student_status", (req, res) => {
                     }
                 }
             }
-        res.status(alunoResultado)
+        res.json(alunoResultado)
     })
 })
 
