@@ -166,7 +166,9 @@ const calcularPontuacaoDeUmQuestionario = () =>{
         fs.createReadStream(nomeQuestionario)
         .pipe(csv.parse({headers:true}))
         .on('data', linha => {
-            pontuacao.push({ra: linha['RA:'], pontuacao: 50})
+            const existing = pontuacao.some(p => p.ra === linha['RA:'])
+            if (!existing)
+                pontuacao.push({ra: linha['RA:'], pontuacao: 50})
         })
         .on('end', rowNumber => {
             resolve(pontuacao)
