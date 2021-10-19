@@ -52,7 +52,7 @@ const consolidatedAvtCoins = () => {
                         }
                 }
                 //avaliacoes
-                const avaliacoes = ['avaliacao_listas']
+                const avaliacoes = ['avaliacao_listas', 'avaliacao_questoes_gerais']
                 for (avaliacao of avaliacoes){
                     const notasDeAvaliacao = await obterPontuacaoDaAvalicao(avaliacao)
                     for (notaDeAvaliacao of notasDeAvaliacao){
@@ -82,6 +82,15 @@ const consolidatedAvtCoins = () => {
                     for (alunoConsolidado  of alunosConsolidados){
                         if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
                             alunoConsolidado.avtCoins += +pontuacaoQuestionario.pontuacao
+                        }
+                    }
+                }
+
+                const pontuacoesPuzzles = await calcularPontuacaoDePuzzles()
+                for (pontuacaoPuzzles of pontuacoesPuzzles){
+                    for (alunoConsolidado  of alunosConsolidados){
+                        if (+alunoConsolidado.ra === +pontuacaoPuzzles.ra){
+                            alunoConsolidado.avtCoins += +pontuacaoPuzzles.pontuacao
                         }
                     }
                 }
@@ -169,6 +178,23 @@ const calcularPontuacaoDeUmQuestionario = () =>{
             const existing = pontuacao.some(p => p.ra === linha['RA:'])
             if (!existing)
                 pontuacao.push({ra: linha['RA:'], pontuacao: 50})
+        })
+        .on('end', rowNumber => {
+            resolve(pontuacao)
+        })
+    })
+}
+
+const calcularPontuacaoDePuzzles = () => {
+    return new Promise ((resolve, reject) => {
+        const nomeArquivoPuzzles = 'puzzles_avt_coins.csv'
+        let pontuacao = []
+        fs.createReadStream(nomeArquivoPuzzles)
+        .pipe(csv.parse({headers:true}))
+        .on('data', linha => {
+            const existing = pontuacao.some(p => p.ra === linha['RA'])
+            if (!existing)
+                pontuacao.push({ra: linha['RA'], pontuacao: linha['Avte coins']})
         })
         .on('end', rowNumber => {
             resolve(pontuacao)

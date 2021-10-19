@@ -48,6 +48,7 @@ app.get('/top_ones', (req, res) => {
 })
 
 app.get("/student_status", (req, res) => {
+    console.log("Chegou aqui")
     processador.obterBaseInteiraPorData()
     .then(baseInteiraPorData => {
         let alunoResultado = { nome: '', ra: 0, avtCoins: 0 }
