@@ -54,6 +54,8 @@ const consolidatedAvtCoins = () => {
                             else {
                                 alunosConsolidados.push({ nome: aluno.nome, ra: aluno.ra, avtCoins: aluno.avtCoins })
                             }
+                            if (aluno.ra == 818136575)
+                                console.log (`${aluno.ra}: ${aluno.avtCoins}`)
                         }
                 }
                 //avaliacoes
@@ -62,9 +64,12 @@ const consolidatedAvtCoins = () => {
                     const notasDeAvaliacao = await obterPontuacaoDaAvalicao(avaliacao)
                     for (notaDeAvaliacao of notasDeAvaliacao){
                         for (alunoConsolidado of alunosConsolidados){
+                            
                             if (+alunoConsolidado.ra === +notaDeAvaliacao.ra){
                                 alunoConsolidado.avtCoins += +notaDeAvaliacao.pontuacao
                             }
+                            if (alunoConsolidado.ra == 818136575)
+                                console.log(`${avaliacao}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
@@ -78,16 +83,24 @@ const consolidatedAvtCoins = () => {
                             if (+alunoConsolidado.ra === +desafio.ra){
                                 alunoConsolidado.avtCoins += +desafio.pontuacao
                             }
+                            if (alunoConsolidado.ra == 818136575)
+                                console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
                 //questionarios (só tem um por enquanto)
+                console.log ('aqui')
                 const pontuacoesQuestionario = await calcularPontuacaoDeUmQuestionario()
                 for (pontuacaoQuestionario of pontuacoesQuestionario){
                     for (alunoConsolidado  of alunosConsolidados){
                         if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
                             alunoConsolidado.avtCoins += +pontuacaoQuestionario.pontuacao
+                            if (alunoConsolidado.ra == 818136575)
+                                console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
+                        
+                        // if (alunoConsolidado.ra == 818136575)
+                        //     console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                     }
                 }
 
@@ -96,6 +109,8 @@ const consolidatedAvtCoins = () => {
                     for (alunoConsolidado  of alunosConsolidados){
                         if (+alunoConsolidado.ra === +pontuacaoPuzzles.ra){
                             alunoConsolidado.avtCoins += +pontuacaoPuzzles.pontuacao
+                            if (alunoConsolidado.ra == 818136575)
+                                console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
