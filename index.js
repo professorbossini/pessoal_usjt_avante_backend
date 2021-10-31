@@ -21,17 +21,23 @@ app.get('/myself_among_others', (req, res) => {
             consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, o => o.avtCoins)
             consolidatedAvtCoins = consolidatedAvtCoins.reverse()
             const posicaoDoAluno = _.findIndex(consolidatedAvtCoins, (a) => a.ra === req.query.ra)
-            let indexOfUpLimit = posicaoDoAluno <= 5 ? 0 : posicaoDoAluno - 5
-            let indexOfBottomLimit = posicaoDoAluno >= consolidatedAvtCoins.length - 4 ? consolidatedAvtCoins.length - 1 : posicaoDoAluno + (10 - (posicaoDoAluno - indexOfUpLimit))
-            // console.log(indexOfUpLimit)
-            // console.log(posicaoDoAluno)
-            // console.log(indexOfBottomLimit)
-            const thePositions = _.range(indexOfUpLimit, indexOfBottomLimit)
-            const upPortion = consolidatedAvtCoins.slice(indexOfUpLimit, posicaoDoAluno)
-            const BottomPortion = consolidatedAvtCoins.slice(posicaoDoAluno, indexOfBottomLimit)
-            theFinalWindow = [...upPortion, ...BottomPortion].map((e, i) => ({posicao: thePositions[i] + 1, ...e}))
-            // console.log(theFinalWindow)
-           res.send(theFinalWindow)
+            //alunos que não preencheram nenhuma chamada e que eventualmente fizeram alguma outra atividade não serão encontrados
+            if (posicaoDoAluno >=0){
+
+                let indexOfUpLimit = posicaoDoAluno <= 5 ? 0 : posicaoDoAluno - 5
+                let indexOfBottomLimit = posicaoDoAluno >= consolidatedAvtCoins.length - 4 ? consolidatedAvtCoins.length - 1 : posicaoDoAluno + (10 - (posicaoDoAluno - indexOfUpLimit))
+                // console.log(indexOfUpLimit)
+                // console.log(posicaoDoAluno)
+                // console.log(indexOfBottomLimit)
+                const thePositions = _.range(indexOfUpLimit, indexOfBottomLimit)
+                const upPortion = consolidatedAvtCoins.slice(indexOfUpLimit, posicaoDoAluno)
+                const BottomPortion = consolidatedAvtCoins.slice(posicaoDoAluno, indexOfBottomLimit)
+                theFinalWindow = [...upPortion, ...BottomPortion].map((e, i) => ({posicao: thePositions[i] + 1, ...e}))
+                // console.log(theFinalWindow)
+               res.send(theFinalWindow)
+            }else{
+                res.send([])
+            }
     })
 })
 
