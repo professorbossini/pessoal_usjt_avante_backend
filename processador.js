@@ -6,36 +6,41 @@ const obterBaseInteiraPorData = () => {
     return new Promise ((resolve, reject) => {
         const avtCoinsPorPresenca = 15
         let alunos = []
-        fs.createReadStream("presencas.csv")
-            .pipe(csv.parse({ headers: true }))
-            .on('data', (linha) => {
-                try{
-                    const date = new Date(linha['Carimbo de data/hora'])
-                    const diaDaSemana = date.getDay()
-                    if (diaDaSemana === 3) {
-                        const data = date.toLocaleDateString()
-                        const aluno = {
-                            nome: linha["Nome completo, sem abreviações"],
-                            ra: linha["RA"],
-                            avtCoins: avtCoinsPorPresenca
-                        }
-                        const item = alunos.find((elemento) => elemento.data === data)
-                        if (!item) {
-                            alunos.push({ data: data, alunos: [aluno] })
-                        } else {
-                            const indice = item.alunos.findIndex(a => a.ra === aluno.ra)
-                            if (indice < 0)
-                                item.alunos.push(aluno)
+        try{
+            fs.createReadStream("presencas.csv")
+                .pipe(csv.parse({ headers: true }))
+                .on('data', (linha) => {
+                    try{
+                        const date = new Date(linha['Carimbo de data/hora'])
+                        const diaDaSemana = date.getDay()
+                        if (diaDaSemana === 3) {
+                            const data = date.toLocaleDateString()
+                            const aluno = {
+                                nome: linha["Nome completo, sem abreviações"],
+                                ra: linha["RA"],
+                                avtCoins: avtCoinsPorPresenca
+                            }
+                            const item = alunos.find((elemento) => elemento.data === data)
+                            if (!item) {
+                                alunos.push({ data: data, alunos: [aluno] })
+                            } else {
+                                const indice = item.alunos.findIndex(a => a.ra === aluno.ra)
+                                if (indice < 0)
+                                    item.alunos.push(aluno)
+                            }
                         }
                     }
-                }
-                catch (e){
-                    console.log(e)
-                }
+                    catch (e){
+                        console.log(e)
+                    }
+                })
+                .on('end', (totalLinhas) => {
+                    resolve(alunos)
             })
-            .on('end', (totalLinhas) => {
-                resolve(alunos)
-            })
+        }
+        catch (e){
+            console.log(e)
+        }
     })
 
 }
@@ -54,8 +59,6 @@ const consolidatedAvtCoins = () => {
                             else {
                                 alunosConsolidados.push({ nome: aluno.nome, ra: aluno.ra, avtCoins: aluno.avtCoins })
                             }
-                            if (aluno.ra == 818136575)
-                                console.log (`${aluno.ra}: ${aluno.avtCoins}`)
                         }
                 }
                 //avaliacoes
@@ -68,8 +71,8 @@ const consolidatedAvtCoins = () => {
                             if (+alunoConsolidado.ra === +notaDeAvaliacao.ra){
                                 alunoConsolidado.avtCoins += +notaDeAvaliacao.pontuacao
                             }
-                            if (alunoConsolidado.ra == 818136575)
-                                console.log(`${avaliacao}: ${alunoConsolidado.avtCoins}`)
+                            // if (alunoConsolidado.ra == 818136575)
+                            //     console.log(`${avaliacao}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
@@ -83,20 +86,20 @@ const consolidatedAvtCoins = () => {
                             if (+alunoConsolidado.ra === +desafio.ra){
                                 alunoConsolidado.avtCoins += +desafio.pontuacao
                             }
-                            if (alunoConsolidado.ra == 818136575)
-                                console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
+                            // if (alunoConsolidado.ra == 818136575)
+                            //     console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
                 //questionarios (só tem um por enquanto)
-                console.log ('aqui')
+                // console.log ('aqui')
                 const pontuacoesQuestionario = await calcularPontuacaoDeUmQuestionario()
                 for (pontuacaoQuestionario of pontuacoesQuestionario){
                     for (alunoConsolidado  of alunosConsolidados){
                         if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
                             alunoConsolidado.avtCoins += +pontuacaoQuestionario.pontuacao
-                            if (alunoConsolidado.ra == 818136575)
-                                console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
+                            // if (alunoConsolidado.ra == 818136575)
+                            //     console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
                         
                         // if (alunoConsolidado.ra == 818136575)
@@ -109,8 +112,8 @@ const consolidatedAvtCoins = () => {
                     for (alunoConsolidado  of alunosConsolidados){
                         if (+alunoConsolidado.ra === +pontuacaoPuzzles.ra){
                             alunoConsolidado.avtCoins += +pontuacaoPuzzles.pontuacao
-                            if (alunoConsolidado.ra == 818136575)
-                                console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
+                            // if (alunoConsolidado.ra == 818136575)
+                            //     console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
                     }
                 }
