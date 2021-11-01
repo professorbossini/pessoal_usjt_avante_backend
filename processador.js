@@ -117,10 +117,32 @@ const consolidatedAvtCoins = () => {
                         }
                     }
                 }
+
+                const pontuacaoVideosEntregues = await calcularPontuacaoDeVideosEntregues()
+                for (pontuacaoVideoEntregue of pontuacaoVideosEntregues){
+                    for (alunoConsolidado  of alunosConsolidados){
+                        if (+alunoConsolidado.ra === +pontuacaoVideoEntregue.ra){
+                            alunoConsolidado.avtCoins += +pontuacaoVideoEntregue.pontuacao
+                        }
+                    }
+                }
                 resolve (alunosConsolidados)
             })
     
 })}
+
+const calcularPontuacaoDeVideosEntregues = () => {
+    return new Promise((resolve, reject) => {
+        const nome_arquivo = 'entrega_videos_30_avtcoins.csv'
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            result.push({ra: linha['RA'], pontuacao: 30})
+        })
+        .on('end', () => resolve(result) )
+    })
+}
 
 const calcularPontuacaoDeTodosOsDesafios = () => {
     return new Promise ((resolve, reject) => {
