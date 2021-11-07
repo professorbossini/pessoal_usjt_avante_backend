@@ -14,11 +14,12 @@ const obterBaseInteiraPorData = () => {
                         const date = new Date(linha['Carimbo de data/hora'])
                         const diaDaSemana = date.getDay()
                         if (diaDaSemana === 3) {
-                            const data = date.toLocaleDateString()
+                            const data = date.toLocaleDateString('pt-BR')
                             const aluno = {
                                 nome: linha["Nome completo, sem abreviações"],
                                 ra: linha["RA"],
-                                avtCoins: avtCoinsPorPresenca
+                                avtCoins: avtCoinsPorPresenca,
+                                dataPresenca: data
                             }
                             const item = alunos.find((elemento) => elemento.data === data)
                             if (!item) {
@@ -50,14 +51,28 @@ const consolidatedAvtCoins = () => {
             obterBaseInteiraPorData()
             .then(async dados => {
                 let alunosConsolidados = []
+                //pontos por presenças em aula
                 for (objeto of dados) {
                         for (aluno of objeto.alunos) {
                             const alunoConsolidado = alunosConsolidados.find((a) => a.ra === aluno.ra)
                             if (alunoConsolidado) {
                                 alunoConsolidado.avtCoins += aluno.avtCoins
+                                alunoConsolidado['historico']['Presenças (15 avtcoins por presença)'] += aluno.avtCoins
+                                alunoConsolidado['historico']['Datas em que esteve presente:'].push(objeto.data)
                             }
                             else {
-                                alunosConsolidados.push({ nome: aluno.nome, ra: aluno.ra, avtCoins: aluno.avtCoins })
+                                alunosConsolidados.push(
+                                    { 
+                                        nome: aluno.nome, 
+                                        ra: aluno.ra, 
+                                        avtCoins: aluno.avtCoins ,
+                                        historico: {
+                                            'Presenças (15 avtcoins por presença)': aluno.avtCoins,
+                                            'Datas em que esteve presente:': [objeto.data]
+                                        },
+                                       
+                                    }
+                                )
                             }
                         }
                 }
@@ -66,25 +81,33 @@ const consolidatedAvtCoins = () => {
                 for (avaliacao of avaliacoes){
                     const notasDeAvaliacao = await obterPontuacaoDaAvalicao(avaliacao)
                     for (notaDeAvaliacao of notasDeAvaliacao){
+                        
                         for (alunoConsolidado of alunosConsolidados){
-                            
+                            if (!alunoConsolidado['historico']['Avaliações (Listas ligadas e questões gerais (50 avtcoins por avaliação))'])
+                                alunoConsolidado['historico']['Avaliações (Listas ligadas e questões gerais (50 avtcoins por avaliação))'] = 0
                             if (+alunoConsolidado.ra === +notaDeAvaliacao.ra){
                                 alunoConsolidado.avtCoins += +notaDeAvaliacao.pontuacao
+                                alunoConsolidado['historico']['Avaliações (Listas ligadas e questões gerais (50 avtcoins por avaliação))'] += +notaDeAvaliacao.pontuacao
                             }
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${avaliacao}: ${alunoConsolidado.avtCoins}`)
+                            
                         }
                     }
                 }
+               
                 //desafios
                 const desafiosCollection = await calcularPontuacaoDeTodosOsDesafios()
                 // console.log(desafios)
                 for (desafios of desafiosCollection){
                     for (desafio of desafios){
                         for (alunoConsolidado of alunosConsolidados){
+                            if (!alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'])
+                            alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'] = 0
                             // console.log (+alunoConsolidado.ra + ' ' + desafio.ra)
                             if (+alunoConsolidado.ra === +desafio.ra){
                                 alunoConsolidado.avtCoins += +desafio.pontuacao
+                                alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'] += + desafio.pontuacao
                             }
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
@@ -96,8 +119,11 @@ const consolidatedAvtCoins = () => {
                 const pontuacoesQuestionario = await calcularPontuacaoDeUmQuestionario()
                 for (pontuacaoQuestionario of pontuacoesQuestionario){
                     for (alunoConsolidado  of alunosConsolidados){
+                        if (!alunoConsolidado['historico']['Questionário (50 avtcoins)'])
+                        alunoConsolidado['historico']['Questionário (50 avtcoins)'] = 0
                         if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
                             alunoConsolidado.avtCoins += +pontuacaoQuestionario.pontuacao
+                            alunoConsolidado['historico']['Questionário (50 avtcoins)'] += +pontuacaoQuestionario.pontuacao
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
@@ -110,8 +136,11 @@ const consolidatedAvtCoins = () => {
                 const pontuacoesPuzzles = await calcularPontuacaoDePuzzles()
                 for (pontuacaoPuzzles of pontuacoesPuzzles){
                     for (alunoConsolidado  of alunosConsolidados){
+                        if (!alunoConsolidado['historico']['Edpuzzles (30 avtcoins)'])
+                        alunoConsolidado['historico']['Edpuzzles (30 avtcoins)'] = 0
                         if (+alunoConsolidado.ra === +pontuacaoPuzzles.ra){
                             alunoConsolidado.avtCoins += +pontuacaoPuzzles.pontuacao
+                            alunoConsolidado['historico']['Edpuzzles (30 avtcoins)'] += +pontuacaoPuzzles.pontuacao
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${JSON.stringify(pontuacaoQuestionario)}: ${alunoConsolidado.avtCoins}`)
                         }
@@ -121,8 +150,11 @@ const consolidatedAvtCoins = () => {
                 const pontuacaoVideosEntregues = await calcularPontuacaoDeVideosEntregues()
                 for (pontuacaoVideoEntregue of pontuacaoVideosEntregues){
                     for (alunoConsolidado  of alunosConsolidados){
+                        if (!alunoConsolidado['historico']['Entrega do vídeo sobre o Avante (30 avtcoins)'])
+                        alunoConsolidado['historico']['Entrega do vídeo sobre o Avante (30 avtcoins)'] = 0
                         if (+alunoConsolidado.ra === +pontuacaoVideoEntregue.ra){
                             alunoConsolidado.avtCoins += +pontuacaoVideoEntregue.pontuacao
+                            alunoConsolidado['historico']['Entrega do vídeo sobre o Avante (30 avtcoins)'] += +pontuacaoVideoEntregue.pontuacao
                         }
                     }
                 }
