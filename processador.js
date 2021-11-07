@@ -58,7 +58,7 @@ const consolidatedAvtCoins = () => {
                             if (alunoConsolidado) {
                                 alunoConsolidado.avtCoins += aluno.avtCoins
                                 alunoConsolidado['historico']['Presenças (15 avtcoins por presença)'] += aluno.avtCoins
-                                alunoConsolidado['historico']['Datas em que esteve presente:'].push(objeto.data)
+                                alunoConsolidado['historico']['Datas em que esteve presente'].push(objeto.data)
                             }
                             else {
                                 alunosConsolidados.push(
@@ -68,7 +68,7 @@ const consolidatedAvtCoins = () => {
                                         avtCoins: aluno.avtCoins ,
                                         historico: {
                                             'Presenças (15 avtcoins por presença)': aluno.avtCoins,
-                                            'Datas em que esteve presente:': [objeto.data]
+                                            'Datas em que esteve presente': [objeto.data]
                                         },
                                        
                                     }
