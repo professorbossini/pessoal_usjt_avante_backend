@@ -1,6 +1,9 @@
-csv = require('fast-csv')
-fs = require('fs')
-_ = require('underscore')
+const csv = require('fast-csv')
+const fs = require('fs')
+const _ = require('underscore')
+const sortArray = require('sort-array')
+const moment = require('moment')
+
 
 const obterBaseInteiraPorData = () => {
     return new Promise ((resolve, reject) => {
@@ -75,7 +78,10 @@ const consolidatedAvtCoins = () => {
                                 )
                             }
                         }
-                }
+                    }
+                    
+
+                    // }
                 //avaliacoes
                 const avaliacoes = ['avaliacao_listas', 'avaliacao_questoes_gerais']
                 for (avaliacao of avaliacoes){
@@ -157,6 +163,18 @@ const consolidatedAvtCoins = () => {
                             alunoConsolidado['historico']['Entrega do vídeo sobre o Avante (30 avtcoins)'] += +pontuacaoVideoEntregue.pontuacao
                         }
                     }
+                }
+                
+                for (alunoConsolidado of alunosConsolidados) {
+                    alunoConsolidado['historico']['Datas em que esteve presente'] = alunoConsolidado['historico']['Datas em que esteve presente'].sort(
+                            (d1, d2) => {
+                                if (moment(d1, 'DD/MM/YYYY').isBefore(moment(d2, 'DD/MM/YYYY')))
+                                    return 1
+                                if (moment(d2, 'DD/MM/YYYY').isBefore(moment(d1, 'DD/MM/YYYY')))
+                                    return -1
+                                return 0
+                            }
+                        )
                 }
                 resolve (alunosConsolidados)
             })
