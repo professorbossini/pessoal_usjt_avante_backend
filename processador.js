@@ -166,18 +166,19 @@ const consolidatedAvtCoins = () => {
                 }
 
                 const pontuacaoDeAlvosBlackboardEntregues = await calcularPontuacaoDeAlvosBlackboardEntregues()
-                for (pontuacaoBlackboardEntregue of pontuacaoDeAlvosBlackboardEntregues){
-                        for (alunoConsolidado  of alunosConsolidados){
-                            if (!alunoConsolidado['historico']['Blackboard'])
-                            alunoConsolidado['historico']['Blackboard'] = []
-                            if (+alunoConsolidado.ra === +pontuacaoBlackboardEntregue.ra){
-                                alunoConsolidado.avtCoins += pontuacaoBlackboardEntregue.alvos.reduce((ac, cur) => ac + cur.pontuacao, 0)
-                                alunoConsolidado['historico']['Blackboard'] = _.sortBy(pontuacaoBlackboardEntregue.alvos, 'alvo')
-                                alunoConsolidado['historico']['Blackboard'] = alunoConsolidado['historico']['Blackboard'].map(a => {
-                                    return `${a.alvo}: ${a.pontuacao}`.replace('"', '')
-                                })
+                for (alunoConsolidado  of alunosConsolidados){
+                    alunoConsolidado['historico']['Blackboard'] = 0
+                    for (pontuacaoBlackboardEntregue of pontuacaoDeAlvosBlackboardEntregues){
+                        if (+alunoConsolidado.ra === +pontuacaoBlackboardEntregue.ra){
+                                if (pontuacaoBlackboardEntregue.alvos.length > 0){
+                                    alunoConsolidado.avtCoins += pontuacaoBlackboardEntregue.alvos.reduce((ac, cur) => ac + cur.pontuacao, 0)
+                                    alunoConsolidado['historico']['Blackboard'] = _.sortBy(pontuacaoBlackboardEntregue.alvos, 'alvo')
+                                    alunoConsolidado['historico']['Blackboard'] = alunoConsolidado['historico']['Blackboard'].map(a => {
+                                        return `${a.alvo}: ${a.pontuacao}`.replace('"', '')
+                                    })
+                                }
                             }
-                        }
+                    }
                 }
                 
                 //ordenando a lista de datas em que o aluno esteve presente
