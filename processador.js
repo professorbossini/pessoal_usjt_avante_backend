@@ -164,7 +164,23 @@ const consolidatedAvtCoins = () => {
                         }
                     }
                 }
+
+                const pontuacaoDeAlvosBlackboardEntregues = await calcularPontuacaoDeAlvosBlackboardEntregues()
+                for (pontuacaoBlackboardEntregue of pontuacaoDeAlvosBlackboardEntregues){
+                        for (alunoConsolidado  of alunosConsolidados){
+                            if (!alunoConsolidado['historico']['Blackboard'])
+                            alunoConsolidado['historico']['Blackboard'] = []
+                            if (+alunoConsolidado.ra === +pontuacaoBlackboardEntregue.ra){
+                                alunoConsolidado.avtCoins += pontuacaoBlackboardEntregue.alvos.reduce((ac, cur) => ac + cur.pontuacao, 0)
+                                alunoConsolidado['historico']['Blackboard'] = _.sortBy(pontuacaoBlackboardEntregue.alvos, 'alvo')
+                                alunoConsolidado['historico']['Blackboard'] = alunoConsolidado['historico']['Blackboard'].map(a => {
+                                    return `${a.alvo}: ${a.pontuacao}`.replace('"', '')
+                                })
+                            }
+                        }
+                }
                 
+                //ordenando a lista de datas em que o aluno esteve presente
                 for (alunoConsolidado of alunosConsolidados) {
                     alunoConsolidado['historico']['Datas em que esteve presente'] = alunoConsolidado['historico']['Datas em que esteve presente'].sort(
                             (d1, d2) => {
@@ -180,6 +196,33 @@ const consolidatedAvtCoins = () => {
             })
     
 })}
+
+const calcularPontuacaoDeAlvosBlackboardEntregues = () => {
+    return new Promise((resolve, reject) => {
+        const pontuacaoPorAlvo = 30
+        const pontuacaoExtraAlvo7 = 50
+        const nome_arquivo = 'entregas_blackboard.csv'
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            const alvoDaVez = linha['A qual alvo esta entrega se refere?']
+            const pontuacao = alvoDaVez === 'Alvo 7' ? pontuacaoPorAlvo + pontuacaoExtraAlvo7 : pontuacaoPorAlvo
+            const alunoExistente = result.find (a => a.ra === linha['RA'])
+            if (alunoExistente) {
+                const jaPontuou = alunoExistente.alvos.find(a => a.alvo === alvoDaVez)
+                if (!jaPontuou){
+                   alunoExistente.alvos.push({alvo: alvoDaVez, pontuacao: pontuacao})
+                }
+            }
+            else{
+
+                result.push({ra: linha['RA'], alvos: [{alvo: alvoDaVez, pontuacao: pontuacao}]})
+            }
+        })
+        .on('end', () => {resolve(result)} )
+    })
+}
 
 const calcularPontuacaoDeVideosEntregues = () => {
     return new Promise((resolve, reject) => {
