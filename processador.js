@@ -317,6 +317,10 @@ const calcularPontuacaoDeTodosOsDesafios = () => {
             {
                 nome: 'desafio_11.csv',
                 pontuacao: 5
+            },
+            {
+                nome: 'desafio_04.csv',
+                pontuacao: 8
             }
         ]
         let promises = []
