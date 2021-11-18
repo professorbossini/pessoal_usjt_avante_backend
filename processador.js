@@ -113,7 +113,7 @@ const consolidatedAvtCoins = () => {
                             // console.log (+alunoConsolidado.ra + ' ' + desafio.ra)
                             if (+alunoConsolidado.ra === +desafio.ra){
                                 alunoConsolidado.avtCoins += +desafio.pontuacao
-                                alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'] += + desafio.pontuacao
+                                alunoConsolidado['historico']['Desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom )'] += + desafio.pontuacao
                             }
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
