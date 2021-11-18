@@ -108,12 +108,12 @@ const consolidatedAvtCoins = () => {
                 for (desafios of desafiosCollection){
                     for (desafio of desafios){
                         for (alunoConsolidado of alunosConsolidados){
-                            if (!alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'])
-                            alunoConsolidado['historico']['3 desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom (20 avtcoins))'] = 0
+                            if (!alunoConsolidado['historico']['Desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom)'])
+                            alunoConsolidado['historico']['Desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom)'] = 0
                             // console.log (+alunoConsolidado.ra + ' ' + desafio.ra)
                             if (+alunoConsolidado.ra === +desafio.ra){
                                 alunoConsolidado.avtCoins += +desafio.pontuacao
-                                alunoConsolidado['historico']['Desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom )'] += + desafio.pontuacao
+                                alunoConsolidado['historico']['Desafios (Tópico Desafios - Obtenha AVANTE COINS no Classroom)'] += +desafio.pontuacao
                             }
                             // if (alunoConsolidado.ra == 818136575)
                             //     console.log(`${JSON.stringify(desafio)}: ${alunoConsolidado.avtCoins}`)
