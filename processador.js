@@ -104,7 +104,7 @@ const consolidatedAvtCoins = () => {
                
                 //desafios
                 const desafiosCollection = await calcularPontuacaoDeTodosOsDesafios()
-                // console.log(desafios)
+                // console.log(desafiosCollection)
                 for (desafios of desafiosCollection){
                     for (desafio of desafios){
                         for (alunoConsolidado of alunosConsolidados){
@@ -293,6 +293,30 @@ const calcularPontuacaoDeTodosOsDesafios = () => {
             {
                 nome: 'desafio_03.csv',
                 pontuacao: 5
+            },
+            {
+                nome: 'desafio_06.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_07.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_08.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_09.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_10.csv',
+                pontuacao: 5
+            },
+            {
+                nome: 'desafio_11.csv',
+                pontuacao: 5
             }
         ]
         let promises = []
@@ -310,7 +334,9 @@ const calcularPontuacaoDeUmDesafio  = (desafio) => {
         fs.createReadStream(`${desafio.nome}`)
         .pipe(csv.parse({headers: true}))
         .on('data', (linha) => {
-            result.push({ra: linha['RA:'], pontuacao: desafio.pontuacao})
+            const existe = result.find(a => a.ra === linha['RA:'])
+            if (!existe)
+                result.push({ra: linha['RA:'], pontuacao: desafio.pontuacao})
         })
         .on('end', () => resolve(result) )
     })
