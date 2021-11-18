@@ -178,7 +178,25 @@ const consolidatedAvtCoins = () => {
                     }
                 }
 
-                
+
+                const pontuacoesSimuladosEnade = await calcularPontuacaoDeSimuladoEnade()
+                for (alunoConsolidado  of alunosConsolidados){
+                    for (pontuacaoSimuladoEnade of pontuacoesSimuladosEnade){
+                        if (+alunoConsolidado.ra === +pontuacaoSimuladoEnade.ra){
+                                if (alunoConsolidado['historico']['Blackboard'] === 0){
+                                    alunoConsolidado['historico']['Blackboard'] = [{"Alvo 7": pontuacaoSimuladoEnade.pontuacao}]
+                                }
+                                else{
+                                    const existente = alunoConsolidado['historico']['Blackboard'].find(a => a.alvo === "Alvo 7")
+                                    if (existente){
+                                        existente.pontuacao = pontuacaoSimuladoEnade.pontuacao
+                                        alunoConsolidado.avtCoins += 20
+                                    }
+                                }
+                        }
+                    }
+                }
+
                 //ajusta a representação textual dos alvos para exibição pelo Bot
                 for (alunoConsolidado  of alunosConsolidados){
                     if (alunoConsolidado['historico']['Blackboard'] !== 0){
@@ -188,8 +206,6 @@ const consolidatedAvtCoins = () => {
                     }
                 }
                 
-
-
                 
                 //ordenando a lista de datas em que o aluno esteve presente
                 for (alunoConsolidado of alunosConsolidados) {
@@ -215,7 +231,9 @@ const calcularPontuacaoDeSimuladoEnade = () => {
         fs.createReadStream(`${nome_arquivo}`)
         .pipe(csv.parse({headers: true}))
         .on('data', (linha) => {
-            result.push({ra: linha['RA'], pontuacao: 100})
+            const existe = result.find (a => a.ra === linha['RA'])
+            if (!existe)
+                result.push({ra: linha['RA'], pontuacao: 100})
         })
         .on('end', () => resolve(result) )
     })
