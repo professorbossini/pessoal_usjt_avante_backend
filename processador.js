@@ -173,13 +173,23 @@ const consolidatedAvtCoins = () => {
                                 if (pontuacaoBlackboardEntregue.alvos.length > 0){
                                     alunoConsolidado.avtCoins += pontuacaoBlackboardEntregue.alvos.reduce((ac, cur) => ac + cur.pontuacao, 0)
                                     alunoConsolidado['historico']['Blackboard'] = _.sortBy(pontuacaoBlackboardEntregue.alvos, 'alvo')
-                                    alunoConsolidado['historico']['Blackboard'] = alunoConsolidado['historico']['Blackboard'].map(a => {
-                                        return `${a.alvo}: ${a.pontuacao}`.replace('"', '')
-                                    })
                                 }
                             }
                     }
                 }
+
+                
+                //ajusta a representação textual dos alvos para exibição pelo Bot
+                for (alunoConsolidado  of alunosConsolidados){
+                    if (alunoConsolidado['historico']['Blackboard'] !== 0){
+                        alunoConsolidado['historico']['Blackboard'] = alunoConsolidado['historico']['Blackboard'].map(a => {
+                            return `${a.alvo}: ${a.pontuacao}`.replace('"', '')
+                        })
+                    }
+                }
+                
+
+
                 
                 //ordenando a lista de datas em que o aluno esteve presente
                 for (alunoConsolidado of alunosConsolidados) {
@@ -197,6 +207,19 @@ const consolidatedAvtCoins = () => {
             })
     
 })}
+
+const calcularPontuacaoDeSimuladoEnade = () => {
+    return new Promise((resolve, reject) => {
+        const nome_arquivo = 'entrega_simulado_enade.csv'
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            result.push({ra: linha['RA'], pontuacao: 100})
+        })
+        .on('end', () => resolve(result) )
+    })
+}
 
 const calcularPontuacaoDeAlvosBlackboardEntregues = () => {
     return new Promise((resolve, reject) => {
