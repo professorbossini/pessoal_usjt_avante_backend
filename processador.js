@@ -197,6 +197,18 @@ const consolidatedAvtCoins = () => {
                     }
                 }
 
+                const pontuacoesCadernosEnade = await calcularPontuacaoDeEntregasdeCadernoEnade()
+                for (alunoConsolidado  of alunosConsolidados){
+                    alunoConsolidado['historico']['Entrega do Caderno Enade'] = 0
+                    for (pontuacaoCadernoEnade of pontuacoesCadernosEnade){
+                        if (+alunoConsolidado.ra === +pontuacaoCadernoEnade.ra){
+                            alunoConsolidado.avtCoins += +pontuacaoCadernoEnade.pontuacao
+                            alunoConsolidado['historico']['Entrega do Caderno Enade'] = pontuacaoCadernoEnade.pontuacao  
+                        }
+                    }
+                }
+
+
                 //ajusta a representação textual dos alvos para exibição pelo Bot
                 for (alunoConsolidado  of alunosConsolidados){
                     if (alunoConsolidado['historico']['Blackboard'] !== 0){
@@ -223,6 +235,21 @@ const consolidatedAvtCoins = () => {
             })
     
 })}
+
+const calcularPontuacaoDeEntregasdeCadernoEnade = () => {
+    return new Promise((resolve, reject) => {
+        const nome_arquivo = 'entregas_cadernos_30avtcoins.csv'
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            const existe = result.find (a => a.ra === linha['RA'])
+            if (!existe)
+                result.push({ra: linha['RA'], pontuacao: 30})
+        })
+        .on('end', () => resolve(result) )
+    })
+}
 
 const calcularPontuacaoDeSimuladoEnade = () => {
     return new Promise((resolve, reject) => {
