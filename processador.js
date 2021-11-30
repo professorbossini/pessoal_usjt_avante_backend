@@ -236,6 +236,48 @@ const consolidatedAvtCoins = () => {
     
 })}
 
+const calcularNotasNoEnadeDeQuemEntregouOCaderno = () => {
+    return new Promise((resolve, reject) => {
+        const mapaDeNomesDeCursos = {
+            SI: "Sistemas de Informação",
+            CCP: "Ciência da Computação",
+            ADS: "Análise e Desenvolvimento de Sistemas",
+            GTI: "Gestão de Tecnologia da Informação"
+        }
+        const nome_arquivo = "enade_respostas_dos_alunos_na_prova.csv"
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            let existente = result.find( a => a.ra === linha['RA'])
+            if (!existente) {
+                existente = {
+                    ra: linha['RA'], 
+                    nome: linha['Nome'], 
+                    curso: mapaDeNomesDeCursos[linha['Curso']],
+                    campus: linha['CAMPUS']
+                }
+                result.push(existente)
+                existente['mapa_questoes_respostas'] = []
+                existente.totalAcertos = 0
+            }
+            existente['mapa_questoes_respostas'].push({
+                questao: linha['Questão'],
+                gabarito: linha['Gabarito'],
+                respostaAluno: linha['Resposta'],
+            })
+            existente.totalAcertos += (linha['Gabarito'] === linha['Resposta'] ? 1: 0)
+        })
+        .on('end', () => {
+            result.forEach(a => {
+                //enade teve 35 questões objetivas
+                a['percentual'] = (a.totalAcertos / 35).toPrecision(2)
+            })
+            resolve(_.sortBy(result, 'percentual').reverse())
+        })
+    })
+}
+
 const calcularPontuacaoDeEntregasdeCadernoEnade = () => {
     return new Promise((resolve, reject) => {
         const nome_arquivo = 'entregas_cadernos_30avtcoins.csv'
@@ -440,4 +482,10 @@ const calcularPontuacaoDePuzzles = () => {
 }
 
 
-module.exports = {consolidatedAvtCoins, obterBaseInteiraPorData, obterDataDaBase, obterPontuacaoDaAvalicao}
+module.exports = {
+    consolidatedAvtCoins, 
+    obterBaseInteiraPorData, 
+    obterDataDaBase, 
+    obterPontuacaoDaAvalicao,
+    calcularNotasNoEnadeDeQuemEntregouOCaderno
+}

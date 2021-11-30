@@ -71,6 +71,17 @@ app.get("/student_status", (req, res) => {
     })
 })
 
+app.get('/resultados_enade', async (req, res) => {
+    try{
+        const resultadosEnade = await processador.calcularNotasNoEnadeDeQuemEntregouOCaderno()
+        res.json(resultadosEnade)
+    }
+    catch (e){
+        console.log ("/resultados_enade", e)
+        res.json([])
+    }
+})
+
 app.get('/date_of_database', (req, res) => {
     const getDados = (dados) => {
         res.send(dados)
