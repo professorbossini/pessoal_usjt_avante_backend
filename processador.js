@@ -184,7 +184,8 @@ const consolidatedAvtCoins = () => {
                     alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = 0
                     for (pontuacaoDeAtividadeQueSubstituiOBlackBoard of pontuacoesDeAtividadeQueSubstituiOBlackBoard){
                         if (+alunoConsolidado.ra === +pontuacaoDeAtividadeQueSubstituiOBlackBoard.ra){
-                            alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = pontuacaoDeAtividadeQueSubstituiOBlackBoard.pontuacao
+                            alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = pontuacaoDeAtividadeQueSubstituiOBlackBoard
+                            alunoConsolidado.avtCoins += pontuacaoDeAtividadeQueSubstituiOBlackBoard.pontuacao
                         }
                     }
                         
@@ -197,6 +198,7 @@ const consolidatedAvtCoins = () => {
                         if (+alunoConsolidado.ra === +pontuacaoSimuladoEnade.ra){
                                 if (alunoConsolidado['historico']['Blackboard'] === 0){
                                     alunoConsolidado['historico']['Blackboard'] = [{alvo: "Alvo 7", pontuacao: pontuacaoSimuladoEnade.pontuacao}]
+                                    alunoConsolidado.avtCoins += 100
                                 }
                                 else{
                                     const existente = alunoConsolidado['historico']['Blackboard'].find(a => a.alvo === "Alvo 7")
@@ -208,6 +210,24 @@ const consolidatedAvtCoins = () => {
                         }
                     }
                 }
+
+                //aqui decidimos se o aluno fica com a pontuacao de blackboard ou da atividade que o substitui
+                for (alunoConsolidado of alunosConsolidados){
+                    const totalBlackboard = 
+                        alunoConsolidado['historico']['Blackboard'] ===  0 ? 0 : 
+                            alunoConsolidado['historico']['Blackboard'].reduce((ac, atual) => ac + atual.pontuacao, 0)
+                    const totalAtividadeSubstitutiva = 
+                        alunoConsolidado['historico']['Atividade que substitui o Blackboard'] === 0 ? 0 : 
+                        alunoConsolidado['historico']['Atividade que substitui o Blackboard'].pontuacao
+                    alunoConsolidado['historico']['Usando Blackboard ou Substitutiva?'] = 
+                        totalBlackboard >= totalAtividadeSubstitutiva ? "Blackboard" : "Substitutiva"
+                    if ( alunoConsolidado['historico']['Usando Blackboard ou Substitutiva?'] === "Blackboard"){
+                        alunoConsolidado.avtCoins -= totalAtividadeSubstitutiva
+                    }
+                    else{
+                        alunoConsolidado.avtCoins -= totalBlackboard
+                    }
+                }   
 
                 const pontuacoesCadernosEnade = await calcularPontuacaoDeEntregasdeCadernoEnade()
                 for (alunoConsolidado  of alunosConsolidados){
@@ -229,7 +249,15 @@ const consolidatedAvtCoins = () => {
                         })
                     }
                 }
-                
+
+                //ajusta a representação textual da ativividade substitutiva do blackboard para o Bot
+                for (alunoConsolidado  of alunosConsolidados){
+                    if (alunoConsolidado['historico']['Atividade que substitui o Blackboard'] !== 0){
+                        alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = alunoConsolidado['historico']['Atividade que substitui o Blackboard'].questoes.map(a => {
+                            return `${a.questao}: ${a.resultado}`.replace('"', '')
+                        })
+                    }
+                }
                 
                 //ordenando a lista de datas em que o aluno esteve presente
                 for (alunoConsolidado of alunosConsolidados) {
@@ -260,16 +288,28 @@ const calcularPontuacaoDeAtividadeQueSubstituiOBlackboard = () => {
                     existente = {
                        ra: linha['RA'],
                        pontuacao: 
-                        ((linha['Questão 9'] === linha['QGab9'] ? 1 : 0) +
-                        (linha['Questão 10'] === linha['QGab10'] ? 1 : 0) +
-                        (linha['Questão 11'] === linha['QGab11'] ? 1 : 0) +
-                        (linha['Questão 12'] === linha['QGab12'] ? 1 : 0) +
-                        (linha['Questão 13'] === linha['QGab13'] ? 1 : 0) +
-                        (linha['Questão 14'] === linha['QGab14'] ? 1 : 0) +
-                        (linha['Questão 15'] === linha['QGab15'] ? 1 : 0) +
-                        (linha['Questão 16'] === linha['QGab16'] ? 1 : 0) +
-                        (linha['Questão 17'] === linha['QGab17'] ? 1 : 0) +
-                        (linha['Questão 18'] === linha['QGab18'] ? 1 : 0))
+                        Math.min(((linha['Questão 9'] === linha['QGab9'] ? 1 : 0) * 35 +
+                        (linha['Questão 10'] === linha['QGab10'] ? 1 : 0) * 35 +
+                        (linha['Questão 11'] === linha['QGab11'] ? 1 : 0) * 35 +
+                        (linha['Questão 12'] === linha['QGab12'] ? 1 : 0) * 35 +
+                        (linha['Questão 13'] === linha['QGab13'] ? 1 : 0) * 35 +
+                        (linha['Questão 14'] === linha['QGab14'] ? 1 : 0) * 35 +
+                        (linha['Questão 15'] === linha['QGab15'] ? 1 : 0) * 35 +
+                        (linha['Questão 16'] === linha['QGab16'] ? 1 : 0) * 35 +
+                        (linha['Questão 17'] === linha['QGab17'] ? 1 : 0) * 35 +
+                        (linha['Questão 18'] === linha['QGab18'] ? 1 : 0) * 35), 310),
+                        questoes: [
+                            {questao: 'Q9', resultado: linha['Questão 9'] === linha['QGab9'] ? '✅': '❌'},
+                            {questao: 'Q10', resultado: linha['Questão 10'] === linha['QGab10'] ? '✅': '❌'},
+                            {questao: 'Q11', resultado:  linha['Questão 11'] === linha['QGab11'] ? '✅': '❌'},
+                            {questao: 'Q12', resultado:  linha['Questão 12'] === linha['QGab12'] ? '✅': '❌'},
+                            {questao: 'Q13', resultado:  linha['Questão 13'] === linha['QGab13'] ? '✅': '❌'},
+                            {questao: 'Q14', resultado:  linha['Questão 14'] === linha['QGab14'] ? '✅': '❌'},
+                            {questao: 'Q15', resultado:  linha['Questão 15'] === linha['QGab15'] ? '✅': '❌'},
+                            {questao: 'Q16', resultado:  linha['Questão 16'] === linha['QGab16'] ? '✅': '❌'},
+                            {questao: 'Q17', resultado:  linha['Questão 17'] === linha['QGab17'] ? '✅': '❌'},
+                            {questao: 'Q18', resultado:  linha['Questão 18'] === linha['QGab18'] ? '✅': '❌'},
+                        ]
                     }
                     result.push(existente)                
                 }
