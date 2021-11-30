@@ -254,7 +254,7 @@ const calcularNotasNoEnadeDeQuemEntregouOCaderno = () => {
                 existente = {
                     ra: linha['RA'], 
                     nome: linha['Nome'], 
-                    curso: mapaDeNomesDeCursos[linha['Curso']],
+                    curso: linha['Curso'],
                     campus: linha['CAMPUS']
                 }
                 result.push(existente)
