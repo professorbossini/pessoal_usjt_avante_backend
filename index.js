@@ -53,6 +53,21 @@ app.get('/top_ones', (req, res) => {
     })
 })
 
+app.get('/all', (req, res) => {
+    processador.consolidatedAvtCoins()
+    .then (consolidatedAvtCoins => {
+        consolidatedAvtCoins = consolidatedAvtCoins.map(a => ({ra: a.ra, nome: titleCase.titleCase(a.nome.toString().toLowerCase()), avtCoins: a.avtCoins}))
+        consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.nome)
+        consolidatedAvtCoins = consolidatedAvtCoins.reverse()
+        consolidatedAvtCoins = _.sortBy (consolidatedAvtCoins, (o) => o.avtCoins)
+        consolidatedAvtCoins = consolidatedAvtCoins.reverse()
+        res.json({
+            totalAlunos: consolidatedAvtCoins.length,
+            consolidatedAvtCoins
+        })
+    })
+})
+
 //it is ignored, getting one student is being done using myself_among_others
 app.get("/student_status", (req, res) => {
     processador.obterBaseInteiraPorData()
