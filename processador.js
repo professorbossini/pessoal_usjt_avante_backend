@@ -176,6 +176,18 @@ const consolidatedAvtCoins = () => {
                                 }
                             }
                     }
+                    
+                }
+
+                const pontuacoesDeAtividadeQueSubstituiOBlackBoard = await calcularPontuacaoDeAtividadeQueSubstituiOBlackboard()
+                for (alunoConsolidado of alunosConsolidados){
+                    alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = 0
+                    for (pontuacaoDeAtividadeQueSubstituiOBlackBoard of pontuacoesDeAtividadeQueSubstituiOBlackBoard){
+                        if (+alunoConsolidado.ra === +pontuacaoDeAtividadeQueSubstituiOBlackBoard.ra){
+                            alunoConsolidado['historico']['Atividade que substitui o Blackboard'] = pontuacaoDeAtividadeQueSubstituiOBlackBoard.pontuacao
+                        }
+                    }
+                        
                 }
 
 
@@ -184,7 +196,7 @@ const consolidatedAvtCoins = () => {
                     for (pontuacaoSimuladoEnade of pontuacoesSimuladosEnade){
                         if (+alunoConsolidado.ra === +pontuacaoSimuladoEnade.ra){
                                 if (alunoConsolidado['historico']['Blackboard'] === 0){
-                                    alunoConsolidado['historico']['Blackboard'] = [{"Alvo 7": pontuacaoSimuladoEnade.pontuacao}]
+                                    alunoConsolidado['historico']['Blackboard'] = [{alvo: "Alvo 7", pontuacao: pontuacaoSimuladoEnade.pontuacao}]
                                 }
                                 else{
                                     const existente = alunoConsolidado['historico']['Blackboard'].find(a => a.alvo === "Alvo 7")
@@ -235,6 +247,39 @@ const consolidatedAvtCoins = () => {
             })
     
 })}
+
+const calcularPontuacaoDeAtividadeQueSubstituiOBlackboard = () => {
+    return new Promise ((resolve, reject) => {
+        const nome_arquivo = "20212_usjt_avante_atividade_para_quem_nao_teve_blackboard.csv"
+            let result = []
+            fs.createReadStream(`${nome_arquivo}`)
+            .pipe(csv.parse({headers: true}))
+            .on('data', (linha) => {
+                let existente = result.find( a => a.ra === linha['RA'])
+                if (!existente) {
+                    existente = {
+                       ra: linha['RA'],
+                       pontuacao: 
+                        ((linha['Questão 9'] === linha['QGab9'] ? 1 : 0) +
+                        (linha['Questão 10'] === linha['QGab10'] ? 1 : 0) +
+                        (linha['Questão 11'] === linha['QGab11'] ? 1 : 0) +
+                        (linha['Questão 12'] === linha['QGab12'] ? 1 : 0) +
+                        (linha['Questão 13'] === linha['QGab13'] ? 1 : 0) +
+                        (linha['Questão 14'] === linha['QGab14'] ? 1 : 0) +
+                        (linha['Questão 15'] === linha['QGab15'] ? 1 : 0) +
+                        (linha['Questão 16'] === linha['QGab16'] ? 1 : 0) +
+                        (linha['Questão 17'] === linha['QGab17'] ? 1 : 0) +
+                        (linha['Questão 18'] === linha['QGab18'] ? 1 : 0))
+                    }
+                    result.push(existente)                
+                }
+                
+            })
+            .on('end', () => {
+                resolve(result)
+            })
+    })
+}
 
 const calcularNotasNoEnadeDeQuemEntregouOCaderno = () => {
     return new Promise((resolve, reject) => {
@@ -327,7 +372,6 @@ const calcularPontuacaoDeAlvosBlackboardEntregues = () => {
                 }
             }
             else{
-
                 result.push({ra: linha['RA'], alvos: [{alvo: alvoDaVez, pontuacao: pontuacao}]})
             }
         })
