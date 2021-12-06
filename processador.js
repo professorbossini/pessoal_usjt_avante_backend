@@ -123,8 +123,8 @@ const consolidatedAvtCoins = () => {
                 //questionarios (só tem um por enquanto)
                 // console.log ('aqui')
                 const pontuacoesQuestionario = await calcularPontuacaoDeUmQuestionario()
-                for (pontuacaoQuestionario of pontuacoesQuestionario){
-                    for (alunoConsolidado  of alunosConsolidados){
+                for (alunoConsolidado  of alunosConsolidados){
+                    for (pontuacaoQuestionario of pontuacoesQuestionario){
                         if (!alunoConsolidado['historico']['Questionário (50 avtcoins)'])
                         alunoConsolidado['historico']['Questionário (50 avtcoins)'] = 0
                         if (+alunoConsolidado.ra === +pontuacaoQuestionario.ra){
@@ -271,10 +271,35 @@ const consolidatedAvtCoins = () => {
                             }
                         )
                 }
+                const RAsAssociadosACampi = await obtemRAAssociadoAoCampus()
+                for (alunoConsolidado of alunosConsolidados) {
+                    for (raAssociadoACampus of RAsAssociadosACampi) {
+                        if (alunoConsolidado.ra === raAssociadoACampus.ra){
+                            alunoConsolidado['campus'] = raAssociadoACampus.campus
+                            console.log(alunoConsolidado)
+                        }
+                    }
+                }
                 resolve (alunosConsolidados)
             })
     
 })}
+
+const obtemRAAssociadoAoCampus = () => {
+    return new Promise((resolve, reject) => {
+        const nome_arquivo = 'base_alunos_ra_campus.csv'
+        let result = []
+        fs.createReadStream(`${nome_arquivo}`)
+        .pipe(csv.parse({headers: true}))
+        .on('data', (linha) => {
+            const existe = result.find (a => a.ra === linha['RA'])
+            if (!existe){
+                result.push({ra: linha['RA'], campus: linha['CAMPUS']})
+            }
+        })
+        .on('end', () => resolve(result) )
+    })
+}
 
 const calcularPontuacaoDeAtividadeQueSubstituiOBlackboard = () => {
     return new Promise ((resolve, reject) => {
