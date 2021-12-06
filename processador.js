@@ -276,9 +276,12 @@ const consolidatedAvtCoins = () => {
                     for (raAssociadoACampus of RAsAssociadosACampi) {
                         if (alunoConsolidado.ra === raAssociadoACampus.ra){
                             alunoConsolidado['campus'] = raAssociadoACampus.campus
-                            console.log(alunoConsolidado)
                         }
                     }
+                }
+                //calculando percentual final
+                for (alunoConsolidado of alunosConsolidados) {
+                    alunoConsolidado['historico']['percentualFinal'] = `${Math.min(100, alunoConsolidado.avtCoins / 400 * 100).toLocaleString()}%`
                 }
                 resolve (alunosConsolidados)
             })
